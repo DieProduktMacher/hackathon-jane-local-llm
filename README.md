@@ -19,11 +19,13 @@ that code — all served by an open-weight LLM running on a local Mac Mini.
 
 ### Example
 
-> **Input:** *"Mr. Brown is 41 years of age... He was playing basketball when
+> **Input:** _"Mr. Brown is 41 years of age... He was playing basketball when
 > he felt a pop in his posterior leg. He was seen locally and diagnosed with
-> an Achilles tendon rupture..."*
+> an Achilles tendon rupture..."_
 >
 > **Output:** Right Achilles tendon rupture — **`S86.011A`**
+
+![Jane AI Agent Demo](jane-ai-agent-demo.gif)
 
 ## Architecture
 
@@ -65,14 +67,14 @@ graph TD
 
 ### Components
 
-| Component                  | Role                                                         |
-| -------------------------- | ------------------------------------------------------------ |
-| **Ollama**                 | Runs open-weight LLMs locally with a simple HTTP API         |
-| **Qwen3-27B** (or similar) | The language model used for diagnosis extraction             |
-| **OpenWebUI**              | Browser-based chat UI; orchestrates the RAG pipeline         |
-| **ChromaDB**               | Embedded vector database for ICD-10 retrieval                |
-| **ngrok**                  | Exposes the local OpenWebUI port over HTTPS                  |
-| **ICD-10 Reference Data**  | Official 2026 tabular index ingested into ChromaDB           |
+| Component                  | Role                                                 |
+| -------------------------- | ---------------------------------------------------- |
+| **Ollama**                 | Runs open-weight LLMs locally with a simple HTTP API |
+| **Qwen3-27B** (or similar) | The language model used for diagnosis extraction     |
+| **OpenWebUI**              | Browser-based chat UI; orchestrates the RAG pipeline |
+| **ChromaDB**               | Embedded vector database for ICD-10 retrieval        |
+| **ngrok**                  | Exposes the local OpenWebUI port over HTTPS          |
+| **ICD-10 Reference Data**  | Official 2026 tabular index ingested into ChromaDB   |
 
 ## Medical History Intake Agent
 
