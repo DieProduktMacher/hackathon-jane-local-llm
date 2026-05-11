@@ -25,7 +25,7 @@ that code — all served by an open-weight LLM running on a local Mac Mini.
 >
 > **Output:** Right Achilles tendon rupture — **`S86.011A`**
 
-![Jane AI Agent Demo](jane-ai-agent-demo.gif)
+![Jane AI Diagnosis Demo](jane-ai-diagnosis.png)
 
 ## Architecture
 
@@ -112,6 +112,8 @@ graph TD;
 A mandatory safety gate runs first; affirmative answers short-circuit the
 interview with a legal-refusal message. State is persisted per session via
 LangGraph's `MemorySaver` checkpointer.
+
+![Jane AI Agent Demo](jane-ai-agent-demo.gif)
 
 ### Tech Stack
 
