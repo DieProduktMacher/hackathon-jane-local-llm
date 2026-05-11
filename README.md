@@ -25,7 +25,7 @@ that code — all served by an open-weight LLM running on a local Mac Mini.
 >
 > **Output:** Right Achilles tendon rupture — **`S86.011A`**
 
-![Jane AI Diagnosis Demo](jane-ai-diagnosis.png)
+![Jane AI Diagnosis Demo](jane-ai-diagnosis-demo.png)
 
 ## Architecture
 
