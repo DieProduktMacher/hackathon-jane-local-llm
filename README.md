@@ -143,3 +143,9 @@ To regenerate the agent flowchart:
 source .venv/bin/activate
 python backend/agent.py
 ```
+
+## AI Cost comparison tool
+
+We have created a small tool to compare different infrastructure setups based on their expected costs. This should facilitate decision making from a financial perspective as well.
+
+The simulator can be viewed at https://dieproduktmacher.github.io/hackathon-jane-local-llm/

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Usage Cost Calculator — Data Sovereignty First</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+        },
+      },
+    };
+  </script>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    html, body { font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif; }
+    .chip-active { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border-color: transparent; }
+    .private-card { border-color: #8b5cf6 !important; background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); }
+    [x-cloak] { display: none !important; }
+
+    /* Pretty range slider */
+    input[type="range"].slider {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      border-radius: 9999px;
+      background: linear-gradient(90deg, #6366f1 var(--pct, 50%), #e2e8f0 var(--pct, 50%));
+      outline: none;
+    }
+    input[type="range"].slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px; height: 22px;
+      border-radius: 9999px;
+      background: white;
+      border: 3px solid #6366f1;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(99,102,241,0.35);
+      transition: transform 0.1s;
+    }
+    input[type="range"].slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
+    input[type="range"].slider::-moz-range-thumb {
+      width: 22px; height: 22px;
+      border-radius: 9999px;
+      background: white;
+      border: 3px solid #6366f1;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(99,102,241,0.35);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased">
+
+<div x-data="calculator()" x-init="init()" x-cloak>
+
+  <!-- HERO -->
+  <header class="bg-gradient-to-br from-slate-900 via-indigo-900 to-violet-900 text-white">
+    <div class="max-w-6xl mx-auto px-6 py-14">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs font-medium mb-5">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        Data sovereignty first · EU-hosted options elevated
+      </div>
+      <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
+        AI Usage <span class="bg-gradient-to-r from-violet-300 to-indigo-200 bg-clip-text text-transparent">Cost Calculator</span>
+      </h1>
+      <p class="mt-4 max-w-2xl text-white/75 text-lg">
+        Compare EU-sovereign SaaS, US providers, and local deployment at a glance.
+        Calibrated for May 2026 prices.
+      </p>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-12 space-y-12">
+
+    <!-- SECTION 1: COMPANY PROFILE -->
+    <section class="bg-white rounded-3xl shadow-sm ring-1 ring-slate-200 p-8">
+      <div class="flex items-center gap-3 mb-8">
+        <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 grid place-items-center font-bold">1</div>
+        <h2 class="text-2xl font-bold">Company Profile</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+
+        <!-- AI Users -->
+        <div>
+          <div class="flex items-baseline justify-between mb-3">
+            <label class="text-sm font-semibold text-slate-700">AI Users</label>
+            <span class="text-2xl font-bold text-indigo-700 tabular-nums" x-text="users"></span>
+          </div>
+          <input type="range" min="1" max="500" step="1" x-model.number="users"
+            class="slider w-full"
+            :style="`--pct: ${((users - 1) / (500 - 1)) * 100}%`" />
+          <div class="flex justify-between text-xs text-slate-400 mt-2">
+            <span>1</span><span>500</span>
+          </div>
+        </div>
+
+        <!-- Prompts per Day -->
+        <div>
+          <div class="flex items-baseline justify-between mb-3">
+            <label class="text-sm font-semibold text-slate-700">Prompts / User / Day</label>
+            <span class="text-2xl font-bold text-indigo-700 tabular-nums" x-text="promptsPerDay"></span>
+          </div>
+          <input type="range" min="1" max="200" step="1" x-model.number="promptsPerDay"
+            class="slider w-full"
+            :style="`--pct: ${((promptsPerDay - 1) / (200 - 1)) * 100}%`" />
+          <div class="flex justify-between text-xs text-slate-400 mt-2">
+            <span>1</span><span>200</span>
+          </div>
+        </div>
+
+        <!-- Amortisation -->
+        <div>
+          <div class="flex items-baseline justify-between mb-3">
+            <label class="text-sm font-semibold text-slate-700">Hardware Amortisation</label>
+            <span class="text-2xl font-bold text-indigo-700 tabular-nums">
+              <span x-text="amortMonths"></span>
+              <span class="text-sm font-medium text-slate-500"> mo</span>
+            </span>
+          </div>
+          <input type="range" min="12" max="60" step="12" x-model.number="amortMonths"
+            class="slider w-full"
+            :style="`--pct: ${((amortMonths - 12) / (60 - 12)) * 100}%`" />
+          <div class="flex justify-between text-xs text-slate-400 mt-2">
+            <span>12</span><span>24</span><span>36</span><span>48</span><span>60</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Task Types -->
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-3">
+          Primary Task Types <span class="text-slate-400 font-normal">(at least one)</span>
+        </label>
+        <div class="flex flex-wrap gap-2">
+          <template x-for="(t, k) in taskMap" :key="k">
+            <button type="button"
+              @click="toggleTask(k)"
+              :class="taskTypes.includes(k) ? 'chip-active' : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'"
+              class="px-4 py-2 rounded-full text-sm font-medium border transition">
+              <span x-text="t.label"></span>
+              <span class="opacity-70 text-xs ml-1" x-text="`(${t.mult.toFixed(1)}×)`"></span>
+            </button>
+          </template>
+        </div>
+        <p class="text-xs text-slate-500 mt-3">
+          Avg task multiplier: <strong x-text="taskMultiplier.toFixed(2) + '×'"></strong> ·
+          Recommended model tier: <strong class="capitalize" x-text="tier"></strong>
+        </p>
+      </div>
+    </section>
+
+    <!-- SECTION 2: TOKEN USAGE -->
+    <section class="bg-white rounded-3xl shadow-sm ring-1 ring-slate-200 p-8">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 grid place-items-center font-bold">2</div>
+        <h2 class="text-2xl font-bold">Estimated Token Usage</h2>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="rounded-2xl bg-slate-50 ring-1 ring-slate-200 p-5">
+          <div class="text-xs uppercase tracking-wide text-slate-500 font-semibold">Monthly Input</div>
+          <div class="text-2xl font-bold mt-1" x-text="fmtTok(monthlyInput)"></div>
+          <div class="text-xs text-slate-500 mt-1" x-text="`${baseTokens.in} tok/req`"></div>
+        </div>
+        <div class="rounded-2xl bg-slate-50 ring-1 ring-slate-200 p-5">
+          <div class="text-xs uppercase tracking-wide text-slate-500 font-semibold">Monthly Output</div>
+          <div class="text-2xl font-bold mt-1" x-text="fmtTok(monthlyOutput)"></div>
+          <div class="text-xs text-slate-500 mt-1" x-text="`${adjOutputTokens} tok/req`"></div>
+        </div>
+        <div class="rounded-2xl bg-slate-50 ring-1 ring-slate-200 p-5">
+          <div class="text-xs uppercase tracking-wide text-slate-500 font-semibold">Total Tokens</div>
+          <div class="text-2xl font-bold mt-1" x-text="fmtTok(monthlyTotal)"></div>
+          <div class="text-xs text-slate-500 mt-1">per month</div>
+        </div>
+        <div class="rounded-2xl bg-slate-50 ring-1 ring-slate-200 p-5">
+          <div class="text-xs uppercase tracking-wide text-slate-500 font-semibold">Daily Requests</div>
+          <div class="text-2xl font-bold mt-1" x-text="fmtNum(dailyRequests)"></div>
+          <div class="text-xs text-slate-500 mt-1" x-text="`${fmtNum(monthlyRequests)} / month`"></div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl bg-gradient-to-br from-indigo-50 to-violet-50 ring-1 ring-indigo-200 p-6">
+        <div class="flex items-start gap-4 flex-wrap">
+          <div class="w-12 h-12 rounded-xl bg-white ring-1 ring-indigo-200 grid place-items-center">
+            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="text-xs uppercase tracking-wide text-indigo-700 font-semibold">Recommended Open-Source Model</div>
+            <div class="text-xl font-bold mt-1" x-text="model.name"></div>
+            <div class="text-sm text-slate-600 mt-1">
+              <span x-text="model.params"></span> parameters ·
+              <span x-text="model.ram"></span> RAM required ·
+              <span x-text="model.speed"></span> generation speed
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: COST COMPARISON -->
+    <section class="bg-white rounded-3xl shadow-sm ring-1 ring-slate-200 p-8">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 grid place-items-center font-bold">3</div>
+        <h2 class="text-2xl font-bold">Monthly Cost Comparison</h2>
+      </div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="rounded-2xl p-5 transition" :class="privateWinner === 'local' ? 'private-card border-2' : 'bg-indigo-50 ring-1 ring-indigo-200'">
+          <div class="flex items-center justify-between">
+            <div class="text-xs uppercase tracking-wide text-indigo-700 font-semibold">Local</div>
+            <template x-if="privateWinner === 'local'">
+              <span class="text-xs">🔒</span>
+            </template>
+          </div>
+          <div class="text-2xl font-bold mt-1 text-indigo-900" x-text="fmt(localMonthly)"></div>
+          <div class="text-xs text-indigo-700 mt-1">🔒 sovereign</div>
+        </div>
+        <div class="rounded-2xl p-5 transition" :class="privateWinner === 'saas' ? 'private-card border-2' : 'bg-violet-50 ring-1 ring-violet-200'">
+          <div class="flex items-center justify-between">
+            <div class="text-xs uppercase tracking-wide text-violet-700 font-semibold">Best Private SaaS</div>
+            <template x-if="privateWinner === 'saas'">
+              <span class="text-xs">🔒</span>
+            </template>
+          </div>
+          <div class="text-2xl font-bold mt-1 text-violet-900" x-text="bestPrivateSaaS ? fmt(bestPrivateSaaS.monthly) : '—'"></div>
+          <div class="text-xs text-violet-700 mt-1" x-text="bestPrivateSaaS ? bestPrivateSaaS.name : ''"></div>
+        </div>
+        <div class="rounded-2xl bg-amber-50 ring-1 ring-amber-200 p-5">
+          <div class="text-xs uppercase tracking-wide text-amber-700 font-semibold">Cheapest Non-Sov.</div>
+          <div class="text-2xl font-bold mt-1 text-amber-900" x-text="cheapestNonSov ? fmt(cheapestNonSov.monthly) : '—'"></div>
+          <div class="text-xs text-amber-700 mt-1">⚠ <span x-text="cheapestNonSov ? cheapestNonSov.name : ''"></span></div>
+        </div>
+        <div class="rounded-2xl bg-slate-100 ring-1 ring-slate-300 p-5">
+          <div class="text-xs uppercase tracking-wide text-slate-600 font-semibold">Claude Teams</div>
+          <div class="text-2xl font-bold mt-1 text-slate-900" x-text="fmt(claudeTeams.monthly)"></div>
+          <div class="text-xs text-slate-600 mt-1">⚠ US-hosted</div>
+        </div>
+      </div>
+
+      <!-- EU SOVEREIGN -->
+      <div class="border-t border-slate-200 pt-6 mb-3">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-emerald-600 text-lg">🔒</span>
+          <h3 class="text-sm font-bold uppercase tracking-wide text-emerald-700">EU-Hosted · Data Sovereign</h3>
+          <div class="flex-1 h-px bg-emerald-200"></div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-xs uppercase tracking-wide text-slate-500 border-b border-slate-200">
+                <th class="py-2 pr-4 font-semibold">Provider</th>
+                <th class="py-2 pr-4 font-semibold">Model</th>
+                <th class="py-2 pr-4 font-semibold">Region</th>
+                <th class="py-2 pr-4 font-semibold text-right">Input / M</th>
+                <th class="py-2 pr-4 font-semibold text-right">Output / M</th>
+                <th class="py-2 pr-4 font-semibold text-right">Monthly</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="p in sovereignProviders" :key="p.id">
+                <tr class="border-b border-slate-100">
+                  <td class="py-3 pr-4 font-semibold" x-text="p.name"></td>
+                  <td class="py-3 pr-4 text-slate-600" x-text="p.model"></td>
+                  <td class="py-3 pr-4 text-slate-600" x-text="p.region"></td>
+                  <td class="py-3 pr-4 text-right tabular-nums" x-text="fmt(p.inUSD, 3)"></td>
+                  <td class="py-3 pr-4 text-right tabular-nums" x-text="fmt(p.outUSD, 3)"></td>
+                  <td class="py-3 pr-4 text-right font-bold tabular-nums" x-text="fmt(p.monthly)"></td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- US NON-SOVEREIGN -->
+      <div class="border-t border-slate-200 pt-6 mt-8">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-amber-600 text-lg">⚠</span>
+          <h3 class="text-sm font-bold uppercase tracking-wide text-amber-700">US-Hosted · Not Data Sovereign (Reference Only)</h3>
+          <div class="flex-1 h-px bg-amber-200"></div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-xs uppercase tracking-wide text-slate-500 border-b border-slate-200">
+                <th class="py-2 pr-4 font-semibold">Provider</th>
+                <th class="py-2 pr-4 font-semibold">Model</th>
+                <th class="py-2 pr-4 font-semibold">Region</th>
+                <th class="py-2 pr-4 font-semibold text-right">Input / M</th>
+                <th class="py-2 pr-4 font-semibold text-right">Output / M</th>
+                <th class="py-2 pr-4 font-semibold text-right">Monthly</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="p in nonSovereignProviders" :key="p.id">
+                <tr class="border-b border-slate-100 text-slate-500">
+                  <td class="py-3 pr-4 font-semibold" x-text="p.name"></td>
+                  <td class="py-3 pr-4" x-text="p.model"></td>
+                  <td class="py-3 pr-4" x-text="p.region"></td>
+                  <td class="py-3 pr-4 text-right tabular-nums" x-text="fmt(p.inUSD, 3)"></td>
+                  <td class="py-3 pr-4 text-right tabular-nums" x-text="fmt(p.outUSD, 3)"></td>
+                  <td class="py-3 pr-4 text-right font-bold tabular-nums" x-text="fmt(p.monthly)"></td>
+                </tr>
+              </template>
+              <tr class="text-slate-500">
+                <td class="py-3 pr-4 font-semibold">Claude Teams</td>
+                <td class="py-3 pr-4">Sonnet + Opus + Claude Code</td>
+                <td class="py-3 pr-4">US</td>
+                <td class="py-3 pr-4 text-right text-slate-400">flat</td>
+                <td class="py-3 pr-4 text-right text-slate-400">flat</td>
+                <td class="py-3 pr-4 text-right font-bold tabular-nums" x-text="fmt(claudeTeams.monthly)"></td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="text-xs text-slate-500 mt-3">Claude Teams: $25/user/month (monthly billing), min 5 users. Includes Sonnet, Opus, and Claude Code.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="text-center text-xs text-slate-500 py-8">
+      Prices reflect May 2026 published rates. USD prices converted at EUR/USD = 1.08.
+      Local hardware sized at 10% peak concurrency; electricity assumes 24/7 operation in the EU.
+    </footer>
+  </main>
+</div>
+
+<script>
+  function calculator() {
+    return {
+      // ---- INPUTS ----
+      users: 50,
+      promptsPerDay: 20,
+      amortMonths: 36,
+      taskTypes: ['general'],
+
+      // ---- FIXED DEFAULTS (no longer user-controlled) ----
+      workingDays: 22,
+      complexity: 'medium',
+      region: 'eu',
+      currency: 'eur',
+
+      // ---- CONSTANTS ----
+      EUR_USD: 1.08,
+
+      complexityTokens: {
+        simple: { in: 150, out: 250 },
+        medium: { in: 400, out: 700 },
+        complex: { in: 1200, out: 1800 },
+      },
+
+      taskMap: {
+        general:  { label: 'General Chat',       mult: 1.0 },
+        coding:   { label: 'Coding',             mult: 1.4 },
+        docs:     { label: 'Document Analysis',  mult: 1.6 },
+        reasoning:{ label: 'Reasoning',          mult: 1.9 },
+        research: { label: 'Research',           mult: 2.3 },
+      },
+
+      hardwareCatalog: {
+        simple:  { name: 'Mac Studio M4 Max 14-core 36GB',  price: 1999, watts: 130, concurrent: 8 },
+        medium:  { name: 'Mac Studio M4 Max 16-core 128GB', price: 3699, watts: 150, concurrent: 3 },
+        complex: { name: 'Mac Studio M3 Ultra 28-core 96GB', price: 3999, watts: 250, concurrent: 2 },
+      },
+
+      modelInfo: {
+        simple:  { name: 'Llama 3.1 8B',  params: '8B',   ram: '16GB',  speed: '~80 tok/s' },
+        medium:  { name: 'Llama 3.3 70B', params: '70B',  ram: '64GB',  speed: '~25 tok/s' },
+        complex: { name: 'GPT-OSS 120B',  params: '120B', ram: '96GB+', speed: '~18 tok/s' },
+      },
+
+      saasProviders: [
+        { id: 'regolo-simple',  name: 'Regolo',      model: 'Llama 3.1 8B',    tier: 'simple',  sovereign: true,  region: 'EU (Italy)',   inEUR: 0.05, outEUR: 0.25 },
+        { id: 'regolo-medium',  name: 'Regolo',      model: 'Llama 3.3 70B',   tier: 'medium',  sovereign: true,  region: 'EU (Italy)',   inEUR: 0.60, outEUR: 2.70 },
+        { id: 'regolo-complex', name: 'Regolo',      model: 'GPT-OSS 120B',    tier: 'complex', sovereign: true,  region: 'EU (Italy)',   inEUR: 1.00, outEUR: 4.20 },
+        { id: 'pm-simple',      name: 'Privatemode', model: 'Gemma 3 27B',     tier: 'simple',  sovereign: true,  region: 'EU (Germany)', inEUR: 0.77, outEUR: 1.27 },
+        { id: 'pm-medium',      name: 'Privatemode', model: 'Qwen3-Coder 30B', tier: 'medium',  sovereign: true,  region: 'EU (Germany)', inEUR: 0.43, outEUR: 1.70 },
+        { id: 'pm-complex',     name: 'Privatemode', model: 'GPT-OSS 120B',    tier: 'complex', sovereign: true,  region: 'EU (Germany)', inEUR: 0.43, outEUR: 1.70 },
+        { id: 'groq-simple',    name: 'Groq',        model: 'Llama 3.1 8B',    tier: 'simple',  sovereign: false, region: 'US',           inUSD: 0.05, outUSD: 0.08 },
+        { id: 'groq-medium',    name: 'Groq',        model: 'Llama 3.3 70B',   tier: 'medium',  sovereign: false, region: 'US',           inUSD: 0.59, outUSD: 0.79 },
+        { id: 'groq-complex',   name: 'Groq',        model: 'GPT-OSS 120B',    tier: 'complex', sovereign: false, region: 'US',           inUSD: 0.15, outUSD: 0.60 },
+        { id: 'tog-simple',     name: 'Together AI', model: 'Llama 3 8B Lite', tier: 'simple',  sovereign: false, region: 'US',           inUSD: 0.10, outUSD: 0.10 },
+        { id: 'tog-medium',     name: 'Together AI', model: 'Llama 3.3 70B',   tier: 'medium',  sovereign: false, region: 'US',           inUSD: 0.88, outUSD: 0.88 },
+        { id: 'tog-complex',    name: 'Together AI', model: 'GPT-OSS 120B',    tier: 'complex', sovereign: false, region: 'US',           inUSD: 0.15, outUSD: 0.60 },
+      ],
+
+      // Electricity in EU (€0.217/kWh, converted to USD internally)
+      euElecRateUSD: 0.217 * 1.08,
+
+      // ---- COMPUTED ----
+      get baseTokens() { return this.complexityTokens[this.complexity]; },
+
+      get taskMultiplier() {
+        if (!this.taskTypes.length) return 1.0;
+        const sum = this.taskTypes.reduce((s, t) => s + this.taskMap[t].mult, 0);
+        return sum / this.taskTypes.length;
+      },
+
+      get tier() {
+        if (this.complexity === 'complex' || this.taskMultiplier >= 1.8) return 'complex';
+        if (this.complexity === 'medium'  || this.taskMultiplier >= 1.3) return 'medium';
+        return 'simple';
+      },
+
+      get model() { return this.modelInfo[this.tier]; },
+      get hw()    { return this.hardwareCatalog[this.tier]; },
+
+      get adjOutputTokens() { return Math.round(this.baseTokens.out * this.taskMultiplier); },
+      get dailyRequests()   { return Math.max(0, this.users * this.promptsPerDay); },
+      get monthlyRequests() { return this.dailyRequests * this.workingDays; },
+      get monthlyInput()    { return this.monthlyRequests * this.baseTokens.in; },
+      get monthlyOutput()   { return this.monthlyRequests * this.adjOutputTokens; },
+      get monthlyTotal()    { return this.monthlyInput + this.monthlyOutput; },
+
+      get peakConcurrent() { return Math.max(1, Math.ceil(this.users * 0.10)); },
+      get units()          { return Math.max(1, Math.ceil(this.peakConcurrent / this.hw.concurrent)); },
+      get totalHwCost()    { return this.units * this.hw.price; },
+      get kwhPerMonth()    { return (this.hw.watts * this.units * 24 * 30.44) / 1000; },
+      get electricityCost(){ return this.kwhPerMonth * this.euElecRateUSD; },
+      get amortHw()        { return this.totalHwCost / this.amortMonths; },
+      get localMonthly()   { return this.amortHw + this.electricityCost; },
+
+      get providersUSD() {
+        return this.saasProviders
+          .filter(p => p.tier === this.tier)
+          .map(p => {
+            const inUSD  = p.sovereign ? p.inEUR  * this.EUR_USD : p.inUSD;
+            const outUSD = p.sovereign ? p.outEUR * this.EUR_USD : p.outUSD;
+            const monthly = (this.monthlyInput  / 1_000_000) * inUSD
+                          + (this.monthlyOutput / 1_000_000) * outUSD;
+            return { ...p, inUSD, outUSD, monthly };
+          });
+      },
+
+      get sovereignProviders()    { return this.providersUSD.filter(p =>  p.sovereign).sort((a, b) => a.monthly - b.monthly); },
+      get nonSovereignProviders() { return this.providersUSD.filter(p => !p.sovereign).sort((a, b) => a.monthly - b.monthly); },
+      get bestPrivateSaaS()       { return this.sovereignProviders[0]; },
+      get cheapestNonSov()        { return this.nonSovereignProviders[0]; },
+      get claudeTeams()           { return { monthly: Math.max(5, this.users) * 25 }; },
+
+      get privateWinner() {
+        if (!this.bestPrivateSaaS) return 'local';
+        return this.localMonthly <= this.bestPrivateSaaS.monthly ? 'local' : 'saas';
+      },
+
+      // ---- HELPERS ----
+      convert(usd) { return usd / this.EUR_USD; },
+
+      fmt(usd, decimals = 0) {
+        const v = this.convert(usd);
+        return '€' + v.toLocaleString('en-US', {
+          minimumFractionDigits: decimals,
+          maximumFractionDigits: decimals,
+        });
+      },
+
+      fmtTok(n) {
+        if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+        if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+        if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+        return Math.round(n).toString();
+      },
+
+      fmtNum(n) { return Math.round(n).toLocaleString('en-US'); },
+
+      toggleTask(t) {
+        if (this.taskTypes.includes(t)) {
+          if (this.taskTypes.length > 1) {
+            this.taskTypes = this.taskTypes.filter(x => x !== t);
+          }
+        } else {
+          this.taskTypes = [...this.taskTypes, t];
+        }
+      },
+
+      init() {},
+    };
+  }
+</script>
+
+</body>
+</html>
